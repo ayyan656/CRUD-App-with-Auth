@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-600 p-4 text-white flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Dashboard</h1>
+        <button id="logoutBtn" onclick="logout()"
+            class="bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600">Logout</button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="p-6 text-center">
+        <h2 class="text-3xl font-bold">User Management</h2>
+        <p class="text-gray-600">Manage your users efficiently</p>
+        <button id="addUserBtn" class="mt-4 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Add New
+            User</button>
+    </section>
+
+    <!-- New User Form (Hidden by default) -->
+    <div id="userForm" class="hidden max-w-md mx-auto bg-white p-6 shadow-lg rounded-lg">
+        <h3 class="text-xl font-semibold mb-4">Add New User</h3>
+        <input type="text" id="name" placeholder="Name" class="w-full mb-2 p-2 border rounded" required>
+        <input type="email" id="email" placeholder="Email" class="w-full mb-2 p-2 border rounded" required>
+        <input type="text" id="username" placeholder="Username" class="w-full mb-2 p-2 border rounded" required>
+        <input type="password" id="password" placeholder="Password" class="w-full mb-2 p-2 border rounded" required>
+        <input type="number" id="age" placeholder="Age" class="w-full mb-2 p-2 border rounded" required>
+        <select id="gender" class="w-full mb-2 p-2 border rounded">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+        <button id="saveUserBtn"
+            class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Save</button>
+    </div>
+
+    <!-- User Table -->
+    <div class="max-w-4xl mx-auto p-6">
+        <table class="w-full bg-white shadow-lg rounded-lg overflow-hidden">
+            <thead class="bg-blue-500 text-white">
+                <tr>
+                    <th class="p-2">Name</th>
+                    <th class="p-2">Email</th>
+                    <th class="p-2">Username</th>
+                    <th class="p-2">Age</th>
+                    <th class="p-2">Gender</th>
+                    <th class="p-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="userTable" class="text-center"></tbody>
+        </table>
+    </div>
+
+    <!-- Edit User Form (Hidden by default) -->
+    <div id="editUserForm" class="hidden max-w-md mx-auto bg-white p-6 shadow-lg rounded-lg">
+        <h3 class="text-xl font-semibold mb-4">Edit User</h3>
+        <input type="hidden" id="editUserId">
+        <input type="text" id="editName" placeholder="Name" class="w-full mb-2 p-2 border rounded">
+        <input type="email" id="editEmail" placeholder="Email" class="w-full mb-2 p-2 border rounded">
+        <input type="text" id="editUsername" placeholder="Username" class="w-full mb-2 p-2 border rounded">
+        <input type="number" id="editAge" placeholder="Age" class="w-full mb-2 p-2 border rounded">
+        <select id="editGender" class="w-full mb-2 p-2 border rounded">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+        <button id="updateUserBtn"
+            class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Update</button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center p-4 mt-6">
+        <p>&copy; 2025 Dashboard. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById("addUserBtn").addEventListener("click", () => {
+            document.getElementById("userForm").classList.toggle("hidden");
+        });
+
+        document.getElementById("saveUserBtn").addEventListener("click", async () => {
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const age = document.getElementById("age").value;
+            const gender = document.getElementById("gender").value;
+
+            if (name && email && username && password && age && gender) {
+                try {
+                    const response = await fetch("http://localhost:3000/auth/addUser", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ name, email, username, password, age, gender })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        alert("User added successfully!");
+                        location.reload();
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Failed to add user.");
+                }
+            } else {
+                alert("Please fill all fields correctly.");
+            }
+        });
+
+        async function loadUsers() {
+            try {
+                const response = await fetch("http://localhost:3000/auth/getUsers");
+                const users = await response.json();
+
+                // Save users to localStorage
+                localStorage.setItem("users", JSON.stringify(users));
+
+                displayUsers(users);
+            } catch (error) {
+                console.error("Error loading users:", error);
+
+                // Load from localStorage if API fails
+                const users = JSON.parse(localStorage.getItem("users")) || [];
+                displayUsers(users);
+            }
+        }
+
+        // Display users in the table
+        function displayUsers(users) {
+            document.getElementById("userTable").innerHTML = users.map(user => `
+                <tr id="${user._id}">
+                    <td class="p-2">${user.name}</td>
+                    <td class="p-2">${user.email}</td>
+                    <td class="p-2">${user.username}</td>
+                    <td class="p-2">${user.age}</td>
+                    <td class="p-2">${user.gender}</td>
+                    <td class="p-2">
+                        <button onclick='showEditForm(${JSON.stringify(user)})' class="bg-yellow-500 text-white px-2 py-1 rounded-lg">Edit</button>
+                        <button onclick='deleteUser("${user._id}")' class="bg-red-500 text-white px-2 py-1 rounded-lg">Delete</button>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        // Load users when the page loads
+        loadUsers();
+
+        // Edit user
+        const showEditForm = (user) => {
+            document.getElementById("editUserId").value = user._id;
+            document.getElementById("editName").value = user.name;
+            document.getElementById("editEmail").value = user.email;
+            document.getElementById("editUsername").value = user.username;
+            document.getElementById("editAge").value = user.age;
+            document.getElementById("editGender").value = user.gender;
+
+            // Hide user table and Add User button
+            document.getElementById("userTable").parentElement.classList.add("hidden");
+            document.getElementById("addUserBtn").classList.add("hidden");
+
+            // Show edit form
+            document.getElementById("editUserForm").classList.remove("hidden");
+        };
+
+        // Hide edit form and show user table
+        document.getElementById("updateUserBtn").addEventListener("click", async () => {
+            const id = document.getElementById("editUserId").value;
+            const name = document.getElementById("editName").value;
+            const email = document.getElementById("editEmail").value;
+            const username = document.getElementById("editUsername").value;
+            const age = document.getElementById("editAge").value;
+            const gender = document.getElementById("editGender").value;
+
+            if (name && email && username && age && gender) {
+                try {
+                    const response = await fetch(`http://localhost:3000/auth/updateUser/${id}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ name, email, username, age, gender })
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        alert("User updated successfully!");
+
+                        // Hide edit form and show user table
+                        document.getElementById("editUserForm").classList.add("hidden");
+                        document.getElementById("userTable").parentElement.classList.remove("hidden");
+                        document.getElementById("addUserBtn").classList.remove("hidden");
+
+                        loadUsers(); // Refresh UI
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Failed to update user.");
+                }
+            } else {
+                alert("Please fill all fields correctly.");
+            }
+        });
+
+        // Delete user
+        const deleteUser = async (id) => {
+            console.log("Deleting user with ID:", id); // Debugging
+
+            if (!id) {
+                alert("Invalid user ID!");
+                return;
+            }
+
+            const confirmDelete = window.confirm("Are you sure you want to delete this user?");
+            if (confirmDelete) {
+                try {
+                    const response = await fetch(`http://localhost:3000/auth/deleteUser/${id}`, { // Fixed API URL
+                        method: 'DELETE',
+                        headers: { "Content-Type": "application/json" }
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        alert("User deleted successfully!");
+                        document.getElementById(id).remove(); // Remove user from UI without reloading
+                    } else {
+                        alert(data.message);
+                    }
+                } catch (error) {
+                    console.error("Error deleting user:", error);
+                    alert("An error occurred while deleting the user.");
+                }
+            }
+        };
+
+        // ✅ Logout Button Functionality
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+            alert("Logged out successfully!");
+            window.location.href = "login.html";
+        });
+
+        // ✅ Logout Function
+            function logout() {
+                fetch("http://localhost:3000/auth/logout", {
+                    method: "POST",
+                    credentials: "include"
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.href = "/login"; // Redirect to login page
+                        } else {
+                            return response.json();
+                        }
+                    })
+                    .then(data => {
+                        if (data?.message) {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+            }
+
+            function checkAuthStatus() {
+                fetch("http://localhost:3000/auth/status", {
+                    method: "GET",
+                    credentials: "include"
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.loggedIn) {
+                            showLogoutButton();
+                        } else {
+                            hideLogoutButton();
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+            }
+
+            function showLogoutButton() {
+                document.getElementById("logoutBtn").style.display = "block";
+            }
+
+            function hideLogoutButton() {
+                document.getElementById("logoutBtn").style.display = "none";
+            }
+    </script>
+</body>
+
+</html>

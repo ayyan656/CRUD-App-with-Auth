@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold text-center text-gray-800">Create an Account</h2>
+        <p class="text-center text-gray-500 text-sm">Sign up to get started</p>
+
+        <form id="signupForm" class="mt-4">
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium">Full Name</label>
+                <input type="text" id="name" placeholder="Enter your name"
+                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium">Email</label>
+                <input type="email" id="email" placeholder="Enter your email"
+                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium">Password</label>
+                <input type="password" id="password" placeholder="Enter your password"
+                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <button type="submit"
+                class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">Sign Up</button>
+        </form>
+
+        <p class="text-center text-gray-500 text-sm mt-4">Already have an account? <a href="/login"
+                class="text-blue-600 hover:underline">Login</a></p>
+    </div>
+
+    <script>
+        document.getElementById("signupForm").addEventListener("submit", function (event) {
+                event.preventDefault(); // Prevent form from refreshing the page
+
+                // ✅ Collect form data
+                const formData = {
+                    name: document.getElementById("name").value,
+                    email: document.getElementById("email").value,
+                    password: document.getElementById("password").value
+                };
+
+                console.log("Submitting Form Data:", formData);
+
+                // ✅ Send data to backend
+                fetch("http://localhost:3000/auth/signup", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                    .then(result => {
+                        if (result.status === 201) {
+                            alert("Signup Successful! Redirecting to login...");
+                            window.location.href = "/login"; // ✅ Redirect to login page after signup
+                        } else {
+                            alert(result.body.message); // ✅ Show error message from backend
+                        }
+                        console.log("Server Response:", result.body);
+                    })
+                    .catch(error => console.error("Error:", error));
+            });
+    </script>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Form</title>
+</head>
+
+<body>
+    <form id="signupForm">
+        <input type="text" name="name" id="name" placeholder="Enter Name">
+        <input type="email" name="email" id="email" placeholder="Enter Email">
+        <input type="password" name="password" id="password" placeholder="Enter Password">
+        <button type="submit">Sign Up</button>
+    </form>
+
+    <script>
+        document.getElementById("signupForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent form from refreshing the page
+
+            // ✅ Collect form data
+            const formData = {
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value
+            };
+
+            console.log("Submitting Form Data:", formData);
+
+            // ✅ Send data to backend
+            fetch("http://localhost:3000/auth/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            })
+                .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                .then(result => {
+                    if (result.status === 201) {
+                        alert("Signup Successful! Redirecting to login...");
+                        window.location.href = "/login"; // ✅ Redirect to login page after signup
+                    } else {
+                        alert(result.body.message); // ✅ Show error message from backend
+                    }
+                    console.log("Server Response:", result.body);
+                })
+                .catch(error => console.error("Error:", error));
+        });
+    </script>
+</body>
+
+</html> -->
