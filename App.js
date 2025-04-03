@@ -28,7 +28,13 @@ store.on("error", function (error) {
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors({ origin: "https://crud-app-with-auth.onrender.com/", credentials: true }));
+app.use(cors({
+  origin: [
+    "https://crud-app-with-auth.onrender.com",
+    "http://localhost:3000" // For local development
+  ],
+  credentials: true
+}));
 app.use(cookieParser());
 
 // Express Session Middleware (Now using MongoDB)
