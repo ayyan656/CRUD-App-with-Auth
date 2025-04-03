@@ -5,8 +5,8 @@ const DATABASE_URL = process.env.DATABASE_URL
 
 
 mongoose.connect(DATABASE_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+   serverSelectionTimeoutMS: 5000, // Timeout after 5s
+   socketTimeoutMS: 45000 // Close sockets after 45s inactivity
 });
 
 const db = mongoose.connection;
