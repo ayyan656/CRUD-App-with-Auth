@@ -66,9 +66,9 @@
                             alert("Signup Successful! Redirecting to login...");
                             window.location.href = "/login"; // ✅ Redirect to login page after signup
                         } else {
-                            alert(result.body.message); // ✅ Show error message from backend
+                            alert(result.body.message)// ✅ Show error message from backend
                         }
-                        console.log("Server Response:", result.body);
+                        console.log("Server Response:", result.body)
                     })
                     .catch(error => console.error("Error:", error));
             });
