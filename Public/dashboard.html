@@ -93,7 +93,7 @@
 
             if (name && email && username && password && age && gender) {
                 try {
-                    const response = await fetch("http://localhost:3000/auth/addUser", {
+                    const response = await fetch("https://crud-app-with-auth.onrender.com/auth/addUser", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -118,7 +118,7 @@
 
         async function loadUsers() {
             try {
-                const response = await fetch("http://localhost:3000/auth/getUsers");
+                const response = await fetch("https://crud-app-with-auth.onrender.com/auth/getUsers");
                 const users = await response.json();
 
                 // Save users to localStorage
@@ -182,7 +182,7 @@
 
             if (name && email && username && age && gender) {
                 try {
-                    const response = await fetch(`http://localhost:3000/auth/updateUser/${id}`, {
+                    const response = await fetch(`https://crud-app-with-auth.onrender.com/auth/updateUser/${id}`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ name, email, username, age, gender })
@@ -222,7 +222,7 @@
             const confirmDelete = window.confirm("Are you sure you want to delete this user?");
             if (confirmDelete) {
                 try {
-                    const response = await fetch(`http://localhost:3000/auth/deleteUser/${id}`, { // Fixed API URL
+                    const response = await fetch(`https://crud-app-with-auth.onrender.com/auth/deleteUser/${id}`, { // Fixed API URL
                         method: 'DELETE',
                         headers: { "Content-Type": "application/json" }
                     });
@@ -249,7 +249,7 @@
 
         // ✅ Logout Function
             function logout() {
-                fetch("http://localhost:3000/auth/logout", {
+                fetch("https://crud-app-with-auth.onrender.com/auth/logout", {
                     method: "POST",
                     credentials: "include"
                 })
